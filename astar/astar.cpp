@@ -1,11 +1,26 @@
 #include "astar.h"
 #include "ui_astar.h"
 
+// Constructors and destructors
+
 astar::astar(QWidget *parent) : QMainWindow(parent), ui(new Ui::astar)
 {
     ui->setupUi(this);
-    drawGrid(10);
+    this->setUpGui();
 }
+
+astar::~astar() { delete ui; }
+
+// GUI Setup
+
+void astar::setUpGui()
+{
+    this->ui->mapAreaGraphics->drawGrid(10);
+    this->ui->lineEditBoxCount->setValidator(new QIntValidator());
+}
+
+// Drawing methods
+
 void astar::drawGrid(int box_count)
 {
     scene = new QGraphicsScene(this);
@@ -47,9 +62,9 @@ void astar::drawGrid(int box_count)
     this->ui->mapAreaGraphics->setRenderHint(QPainter::HighQualityAntialiasing);
 }
 
-astar::~astar() { delete ui; }
+// Slots
 
-void astar::on_horizontalSlider_valueChanged(int value)
+void astar::on_sliderZoom_valueChanged(int value)
 {
     auto scale = value / 100.0;
 
@@ -58,9 +73,9 @@ void astar::on_horizontalSlider_valueChanged(int value)
     this->ui->mapAreaGraphics->setTransform(QTransform::fromScale(scale, scale));
 }
 
-void astar::on_pushButton_clicked()
+void astar::on_buttonBoxCount_clicked()
 {
-    auto text = this->ui->lineEdit->text();
+    auto text = this->ui->lineEditBoxCount->text();
     auto box_count = text.toInt();
-    this->drawGrid(box_count);
+    this->ui->mapAreaGraphics->drawGrid(box_count);
 }

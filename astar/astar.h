@@ -9,7 +9,7 @@
 #include <QWidget>
 #include <QPen>
 #include <QGraphicsScene>
-#include "mapwidget.h"
+#include "mapview.h"
 
 namespace Ui {
 class astar;
@@ -21,6 +21,7 @@ class astar : public QMainWindow
 public:
     explicit astar(QWidget *parent=nullptr);
     void drawGrid(int box_count);
+    void setUpGui();
     ~astar();
 
 private:
@@ -29,9 +30,8 @@ private:
     QGraphicsEllipseItem *ellipse;
 
 private slots:
-
-    void on_horizontalSlider_valueChanged(int value);
-    void on_pushButton_clicked();
+    void on_sliderZoom_valueChanged(int value);
+    void on_buttonBoxCount_clicked();
 };
 
 #endif // ASTAR_H

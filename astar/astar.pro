@@ -28,12 +28,12 @@ SOURCES += \
     astar.cpp \
     grid.cpp \
     main.cpp \
-    mapwidget.cpp
+    mapview.cpp
 
 HEADERS += \
     astar.h \
     grid.h \
-    mapwidget.h
+    mapview.h
 
 FORMS += \
         forms/astar.ui
