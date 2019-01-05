@@ -33,7 +33,8 @@ SOURCES += \
 HEADERS += \
     astar.h \
     grid.h \
-    mapview.h
+    mapview.h \
+    drawing_utils.h
 
 FORMS += \
         forms/astar.ui

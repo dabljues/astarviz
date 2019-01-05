@@ -20,7 +20,6 @@ class astar : public QMainWindow
     Q_OBJECT
 public:
     explicit astar(QWidget *parent=nullptr);
-    void drawGrid(int box_count);
     void setUpGui();
     ~astar();
 

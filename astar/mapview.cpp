@@ -1,5 +1,7 @@
 #include "mapview.h"
 
+// Constructors
+
 mapview::mapview()
 {
     setUpGui();
@@ -10,20 +12,31 @@ mapview::mapview(QWidget *parent) : QGraphicsView(parent)
     setUpGui();
 }
 
+// GUI setup
+
 void mapview::setUpGui()
 {
+    if (scene != nullptr)
+    {
+        scene->clear();
+        delete scene;
+    }
     scene = new QGraphicsScene(this);
 
     this->setScene(scene);
-    this->setRenderHint(QPainter::Antialiasing);
-    this->setRenderHint(QPainter::HighQualityAntialiasing);
+    this->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
 }
+
+// Events
 
 void mapview::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         lastPoint = event->pos();
         scribbling = true;
+    } else if (event->button() == Qt::RightButton) {
+        removeWall(event->pos());
+        scribbling = false;
     }
 }
 
@@ -44,31 +57,48 @@ void mapview::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+
+// Drawing methods
+
 void mapview::drawGrid(const int box_count)
 {
     scene->clear();
 
-    auto x = 0.0;
-    auto y = 0.0;
+    // Saving up parameters
+    drawing_params.margin = 20.0;
+    drawing_params.width = this->width();
+    drawing_params.height = this->height();
 
-    this->margin = 20.0;
+    // Getting the parameters to reduce text length
+    auto margin = drawing_params.margin;
+    auto width = drawing_params.width;
+    auto height = drawing_params.height;
+    auto drawing_width = width - 2 * margin;
+    auto drawing_height = height - 2 * margin;
 
-    _width = this->width() - 2 * margin;
-    _height = this->height() - 2 * margin;
+    drawing_params.box_count = box_count;
+    drawing_params.box_size = drawing_width / box_count;
+    auto box_size = drawing_params.box_size;
 
-    if (fabs(_width - _height) >= std::numeric_limits<double>::epsilon())
+    if (fabs(width - height) >= std::numeric_limits<double>::epsilon())
     {
-//        qDebug() << "width (" << width <<  ") != height (" << height << ")";
         return;
     }
 
-    this->box_count = box_count;
-    this->box_size = _width / box_count;
+    bounds = Bounds(margin, margin, width - margin, height - margin);
+
+    auto x = 0.0;
+    auto y = 0.0;
+
+    QPen pen;
+    pen.setColor(Qt::black);
 
     // Horizontal
     for (auto i = 0; i <= box_count; i++)
     {
-        scene->addLine(x, y, x + _width, y);
+        QGraphicsLineItem *line = new QGraphicsLineItem(x, y, x + drawing_width, y);
+        line->setPen(pen);
+        scene->addItem(line);
         y += box_size;
     }
 
@@ -77,20 +107,74 @@ void mapview::drawGrid(const int box_count)
     // Vertical
     for (auto i = 0; i <= box_count; i++)
     {
-        scene->addLine(x, y, x, y + _height);
+        QGraphicsLineItem *line = new QGraphicsLineItem(x, y, x, y + drawing_height);
+        line->setPen(pen);
+        scene->addItem(line);
         x += box_size;
+    }
+}
+
+QPoint mapview::findBox(const QPointF &point)
+{
+    auto hbar_pos = this->horizontalScrollBar()->value();
+    auto vbar_pos = this->verticalScrollBar()->value();
+
+    auto margin = drawing_params.margin;
+    auto box_size = drawing_params.box_size;
+    auto scale = drawing_params.scale;
+
+    auto x = (point.x() - margin) / scale + hbar_pos;
+    auto y = (point.y() - margin) / scale + vbar_pos;
+
+    qDebug() << "X: " << x << ", Y: " << y;
+
+    auto x_pos = static_cast<int>(x / box_size);
+    auto y_pos = static_cast<int>(y / box_size);
+
+    x = x_pos * box_size;
+    y = y_pos * box_size;
+
+    return QPoint(x_pos, y_pos);
+}
+
+void mapview::drawBox(const QPointF &point, const QColor color)
+{
+    if (!bounds.inBounds(point)) return;
+
+    auto pos = findBox(point);
+
+    auto it = std::find(terrains.begin(), terrains.end(), pos);
+    auto items = scene->items();
+    if(it != terrains.end()) return;
+
+    auto box_size = drawing_params.box_size;
+    Terrain t = Terrain(pos.x() * box_size, pos.y() * box_size, box_size, box_size, pos);
+    t.rect->setBrush(QBrush(color));
+    t.rect->setPen(QPen());
+    terrains.push_back(t);
+    scene->addItem(t.rect);
+}
+
+void mapview::removeBox(const QPointF &point)
+{
+    if (!bounds.inBounds(point)) return;
+
+    auto pos = findBox(point);
+
+    auto it = std::find(terrains.begin(), terrains.end(), pos);
+    if(it != terrains.end())
+    {
+        this->scene->removeItem(it->rect);
+        terrains.erase(it);
     }
 }
 
 void mapview::drawWall(const QPointF &endPoint)
 {
-    auto x = endPoint.x() - margin;
-    auto y = endPoint.y() - margin;
+    drawBox(endPoint, Qt::red);
+}
 
-    x = static_cast<int>(x / box_size) * box_size;
-    y = static_cast<int>(y / box_size) * box_size;
-
-    QGraphicsRectItem* rect = new QGraphicsRectItem(x, y, this->box_size, this->box_size);
-    rect->setBrush(QBrush(Qt::red));
-    scene->addItem(rect);
+void mapview::removeWall(const QPointF &point)
+{
+    removeBox(point);
 }
