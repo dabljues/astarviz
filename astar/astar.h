@@ -10,6 +10,7 @@
 #include <QPen>
 #include <QGraphicsScene>
 #include "mapview.h"
+#include "astar_algorithm.h"
 
 namespace Ui {
 class astar;
@@ -31,6 +32,7 @@ private:
 private slots:
     void on_sliderZoom_valueChanged(int value);
     void on_buttonBoxCount_clicked();
+    void on_buttonCalculate_clicked();
 };
 
 #endif // ASTAR_H

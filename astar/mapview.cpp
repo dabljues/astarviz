@@ -114,17 +114,20 @@ void mapview::drawGrid(const int box_count)
     }
 }
 
+
 QPoint mapview::findBox(const QPointF &point)
 {
     auto hbar_pos = this->horizontalScrollBar()->value();
     auto vbar_pos = this->verticalScrollBar()->value();
 
+    qDebug() << "hbar_pos: " << hbar_pos << ", vbar_pos: " << vbar_pos;
+
     auto margin = drawing_params.margin;
     auto box_size = drawing_params.box_size;
     auto scale = drawing_params.scale;
 
-    auto x = (point.x() - margin) / scale + hbar_pos;
-    auto y = (point.y() - margin) / scale + vbar_pos;
+    auto x = (point.x() - margin + hbar_pos) / scale;
+    auto y = (point.y() - margin + vbar_pos) / scale;
 
     qDebug() << "X: " << x << ", Y: " << y;
 
@@ -144,8 +147,10 @@ void mapview::drawBox(const QPointF &point, const QColor color)
     auto pos = findBox(point);
 
     auto it = std::find(terrains.begin(), terrains.end(), pos);
-    auto items = scene->items();
+    // If the box is already present on the screen - don't redraw it
     if(it != terrains.end()) return;
+    auto items = scene->items();
+
 
     auto box_size = drawing_params.box_size;
     Terrain t = Terrain(pos.x() * box_size, pos.y() * box_size, box_size, box_size, pos);
@@ -178,3 +183,24 @@ void mapview::removeWall(const QPointF &point)
 {
     removeBox(point);
 }
+
+// Misc
+
+std::vector<std::vector<bool>> mapview::get_maze()
+{
+    std::vector<std::vector<bool>> result;
+    result.resize(drawing_params.box_count);
+    // Filling a vector with values of true (no terrains for now)
+    for (auto &i : result)
+    {
+        i.resize(drawing_params.box_count);
+        std::fill(i.begin(), i.end(), true);
+    }
+    // Adding the terrains from the drawing
+    for (auto &t : terrains)
+    {
+        result[t.pos.y()][t.pos.x()] = false;
+    }
+    return result;
+}
+

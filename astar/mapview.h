@@ -26,7 +26,7 @@ public:
         delete scene;
     }    
     void drawGrid(const int box_count);
-
+    std::vector<std::vector<bool>> get_maze();
     DrawingParameters drawing_params;
 
 

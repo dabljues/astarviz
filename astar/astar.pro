@@ -28,13 +28,15 @@ SOURCES += \
     astar.cpp \
     grid.cpp \
     main.cpp \
-    mapview.cpp
+    mapview.cpp \
+    astar_algorithm.cpp
 
 HEADERS += \
     astar.h \
     grid.h \
     mapview.h \
-    drawing_utils.h
+    drawing_utils.h \
+    astar_algorithm.h
 
 FORMS += \
         forms/astar.ui
