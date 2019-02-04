@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QScrollBar>
 
+#include <map>
 #include <vector>
 
 #include "drawing_utils.h"
@@ -30,6 +31,9 @@ public:
     DrawingParameters drawing_params;
 
 
+    //    std::map<QPoint, int> _terrains; Possibly switching to a map to have a const lookup time
+    std::vector<Terrain> terrains;
+
 protected:
     void setUpGui();
     void mousePressEvent(QMouseEvent *event) override;
@@ -41,9 +45,8 @@ private:
 
     bool scribbling;
     QPoint lastPoint;
-    std::vector<Terrain> terrains;
-
     QGraphicsScene *scene = nullptr;
+
     QPoint findBox(const QPointF &point);
     void drawBox(const QPointF &point, const QColor color);
     void removeBox(const QPointF &point);
