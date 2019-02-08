@@ -3,53 +3,47 @@
 
 #include <QPoint>
 
-#include <vector>
-#include <map>
-#include <array>
 #include <algorithm>
-#include <utility>
+#include <array>
 #include <functional>
+#include <map>
 #include <memory>
 #include <set>
+#include <utility>
+#include <vector>
+#include <thread>
 
+#include "algorithm_utils.h"
 #include "mapview.h"
-
-struct result_path
-{
-public:
-    std::vector<QPoint> path;
-};
-
-class node
-{
-public:
-    node() {}
-    node(const QPoint& p) : pos(p) {}
-    bool operator == (const node& o ) const { return pos.x() == o.pos.x() && pos.y() == o.pos.y(); }
-    bool operator == (const QPoint& o ) const { return pos.x() == o.x() && pos.y() == o.y(); }
-    bool operator != (const node& o) const {return pos.x() != o.pos.x() || pos.y() != o.pos.y(); }
-    bool operator <(const node& o ) const { return G + H < o.G + o.H; }
-    QPoint pos;
-    std::shared_ptr<node> parent;
-    int G = 0;
-    int H = 0;
-};
 
 class astar_algorithm
 {
     const std::vector<std::vector<bool>> _maze_matrix;
     const QPoint _start;
     const QPoint _end;
+
 public:
     astar_algorithm() = delete;
-    astar_algorithm(const std::vector<std::vector<bool>>& maze_matrix, const QPoint& start, const QPoint& end) : _maze_matrix(maze_matrix), _start(start), _end(end) {}
-    result_path calculate(mapview*);
+    astar_algorithm(const std::vector<std::vector<bool>>& maze_matrix, const QPoint& start,
+                    const QPoint& end)
+        : _maze_matrix(maze_matrix), _start(start), _end(end)
+    {
+    }
+    result_path calculate(mapview*, int dirs = 4);
     mapview* map_view;
+
 private:
+    int directions;
     int heuristic_cost_estimate(const QPoint& start, const QPoint& end) const;
-    std::vector<node> get_neighbors(node& n) const;
+    std::vector<std::shared_ptr<node>> get_neighbors(node& n) const;
+    std::vector<QPoint> _get_neighbors(node& n) const;
     std::vector<node> get_neighbors_diagonal(node& n) const;
     bool valid_point(int x, int y) const;
+    void draw_change(const node &n)
+    {
+        map_view->drawVisited(n);
+        qApp->processEvents();
+    }
 };
 
-#endif // ASTAR_ALGORITHM_H
+#endif  // ASTAR_ALGORITHM_H

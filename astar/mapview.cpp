@@ -2,15 +2,9 @@
 
 // Constructors
 
-mapview::mapview()
-{
-    setUpGui();
-}
+mapview::mapview() { setUpGui(); }
 
-mapview::mapview(QWidget *parent) : QGraphicsView(parent)
-{
-    setUpGui();
-}
+mapview::mapview(QWidget *parent) : QGraphicsView(parent) { setUpGui(); }
 
 // GUI setup
 
@@ -24,17 +18,21 @@ void mapview::setUpGui()
     scene = new QGraphicsScene(this);
 
     this->setScene(scene);
-    this->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
+    this->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing |
+                         QPainter::HighQualityAntialiasing);
 }
 
 // Events
 
 void mapview::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::LeftButton)
+    {
         lastPoint = event->pos();
         scribbling = true;
-    } else if (event->button() == Qt::RightButton) {
+    }
+    else if (event->button() == Qt::RightButton)
+    {
         removeWall(event->pos());
         scribbling = false;
     }
@@ -57,12 +55,12 @@ void mapview::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-
 // Drawing methods
 
 void mapview::drawGrid(const int box_count)
 {
     scene->clear();
+    terrains.clear();
 
     // Saving up parameters
     drawing_params.margin = 20.0;
@@ -114,13 +112,24 @@ void mapview::drawGrid(const int box_count)
     }
 }
 
+void mapview::drawVisited(const node &n)
+{
+    auto items = scene->items();
+    auto point = n.pos;
+    auto box_size = drawing_params.box_size;
+    VisitedBox *vb = new VisitedBox();
+    vb->position = point;
+    vb->setRect(point.x() * box_size, point.y() * box_size, box_size, box_size);
+    vb->setBrush(QBrush(Qt::lightGray));
+    vb->setPen(QPen());
+    vb->setText(QString::number(n.G), QString::number(n.H));
+    scene->addItem(vb);
+}
 
 QPoint mapview::findBox(const QPointF &point)
 {
     auto hbar_pos = this->horizontalScrollBar()->value();
     auto vbar_pos = this->verticalScrollBar()->value();
-
-    qDebug() << "hbar_pos: " << hbar_pos << ", vbar_pos: " << vbar_pos;
 
     auto margin = drawing_params.margin;
     auto box_size = drawing_params.box_size;
@@ -128,8 +137,6 @@ QPoint mapview::findBox(const QPointF &point)
 
     auto x = (point.x() - margin + hbar_pos) / scale;
     auto y = (point.y() - margin + vbar_pos) / scale;
-
-    qDebug() << "X: " << x << ", Y: " << y;
 
     auto x_pos = static_cast<int>(x / box_size);
     auto y_pos = static_cast<int>(y / box_size);
@@ -148,9 +155,8 @@ void mapview::drawBox(const QPointF &point, const QColor color)
 
     auto it = std::find(terrains.begin(), terrains.end(), pos);
     // If the box is already present on the screen - don't redraw it
-    if(it != terrains.end()) return;
+    if (it != terrains.end()) return;
     auto items = scene->items();
-
 
     auto box_size = drawing_params.box_size;
     Terrain t = Terrain(pos.x() * box_size, pos.y() * box_size, box_size, box_size, pos);
@@ -167,21 +173,35 @@ void mapview::removeBox(const QPointF &point)
     auto pos = findBox(point);
 
     auto it = std::find(terrains.begin(), terrains.end(), pos);
-    if(it != terrains.end())
+    if (it != terrains.end())
     {
         this->scene->removeItem(it->rect);
         terrains.erase(it);
     }
 }
 
-void mapview::drawWall(const QPointF &endPoint)
-{
-    drawBox(endPoint, Qt::red);
-}
+void mapview::drawWall(const QPointF &endPoint) { drawBox(endPoint, Qt::red); }
 
-void mapview::removeWall(const QPointF &point)
+void mapview::removeWall(const QPointF &point) { removeBox(point); }
+
+void mapview::drawResult(const result_path &result)
 {
-    removeBox(point);
+    auto box_size = drawing_params.box_size;
+    auto current = result.path.begin();
+    QPen pen;
+    pen.setColor(Qt::green);
+    pen.setWidthF(5.0);
+    for (auto it = result.path.begin() + 1; it != result.path.end(); it++)
+    {
+        auto start_x = current->x() * box_size + box_size / 2;
+        auto start_y = current->y() * box_size + box_size / 2;
+        auto end_x = it->x() * box_size + box_size / 2;
+        auto end_y = it->y() * box_size + box_size / 2;
+        QGraphicsLineItem *line = new QGraphicsLineItem(start_x, start_y, end_x, end_y);
+        line->setPen(pen);
+        scene->addItem(line);
+        current = it;
+    }
 }
 
 // Misc
@@ -203,4 +223,3 @@ std::vector<std::vector<bool>> mapview::get_maze()
     }
     return result;
 }
-

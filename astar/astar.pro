@@ -36,7 +36,8 @@ HEADERS += \
     grid.h \
     mapview.h \
     drawing_utils.h \
-    astar_algorithm.h
+    astar_algorithm.h \
+    algorithm_utils.h
 
 FORMS += \
         forms/astar.ui

@@ -15,7 +15,8 @@ astar::~astar() { delete ui; }
 
 void astar::setUpGui()
 {
-    this->ui->mapAreaGraphics->drawGrid(10);
+    this->ui->mapAreaGraphics->drawGrid(30);
+    this->ui->lineEditBoxCount->setText("30");
     this->ui->lineEditBoxCount->setValidator(new QIntValidator());
 }
 
@@ -43,4 +44,5 @@ void astar::on_buttonCalculate_clicked()
     auto maze = this->ui->mapAreaGraphics->get_maze();
     astar_algorithm alg(maze, QPoint(0, 0), QPoint(last_box, last_box));
     auto result = alg.calculate(this->ui->mapAreaGraphics);
+    this->ui->mapAreaGraphics->drawResult(result);
 }
