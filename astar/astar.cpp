@@ -46,3 +46,8 @@ void astar::on_buttonCalculate_clicked()
     auto result = alg.calculate(this->ui->mapAreaGraphics);
     this->ui->mapAreaGraphics->drawResult(result);
 }
+void astar::on_buttonResetUI_clicked()
+{
+    this->ui->mapAreaGraphics->setUpGui();
+    this->setUpGui();
+}

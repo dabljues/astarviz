@@ -10,16 +10,22 @@ mapview::mapview(QWidget *parent) : QGraphicsView(parent) { setUpGui(); }
 
 void mapview::setUpGui()
 {
-    if (scene != nullptr)
-    {
-        scene->clear();
-        delete scene;
-    }
+    resetGui();
     scene = new QGraphicsScene(this);
 
     this->setScene(scene);
     this->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing |
                          QPainter::HighQualityAntialiasing);
+}
+
+void mapview::resetGui()
+{
+    if (scene != nullptr)
+    {
+        scene->clear();
+        delete scene;
+    }
+    terrains.clear();
 }
 
 // Events

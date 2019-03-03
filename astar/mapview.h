@@ -37,7 +37,7 @@ public:
     //    std::map<QPoint, int> _terrains; Possibly switching to a map to have a const lookup time
     std::vector<Terrain> terrains;
     void setUpGui();
-
+    void resetGui();
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

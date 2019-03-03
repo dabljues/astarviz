@@ -33,6 +33,7 @@ private slots:
     void on_sliderZoom_valueChanged(int value);
     void on_buttonBoxCount_clicked();
     void on_buttonCalculate_clicked();
+    void on_buttonResetUI_clicked();
 };
 
 #endif // ASTAR_H
