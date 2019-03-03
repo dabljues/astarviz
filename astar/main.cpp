@@ -1,5 +1,5 @@
-#include "astar.h"
 #include <QApplication>
+#include "astar.h"
 
 int main(int argc, char *argv[])
 {

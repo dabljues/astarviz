@@ -10,4 +10,4 @@ public:
     grid(int b_count);
 };
 
-#endif // GRID_H
+#endif  // GRID_H
