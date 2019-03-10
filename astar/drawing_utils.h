@@ -26,19 +26,6 @@ private:
     QString h_text;
 };
 
-//class VisitedBox
-//{
-//public:
-//    VisitedBox() = default;
-//    VisitedBox(double x, double y, double width, double height, QPoint &pos) : pos(pos)
-//    {
-//        rect = new QGraphicsRectItem(x, y, width, height);
-//        rect
-//    }
-//    bool operator==(const QPoint &p) { return p.x() == pos.x() && p.y() == pos.y(); }
-//    QGraphicsRectItem *rect;
-//    QPoint pos;
-//};
 
 class Terrain
 {
