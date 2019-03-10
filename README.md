@@ -16,3 +16,4 @@ A* algorithm with visualization using C++ and Qt Framework
 * Add more colors for a better visualization of the algorithm
 
 * Check if Qt allows abandoning raw pointers for `STL`'s smart pointers
+

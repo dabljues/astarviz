@@ -1,6 +1,7 @@
 #ifndef MAPVIEW_H
 #define MAPVIEW_H
 
+#include <QApplication>
 #include <QColor>
 #include <QDebug>
 #include <QGraphicsScene>
@@ -9,7 +10,6 @@
 #include <QPen>
 #include <QPoint>
 #include <QScrollBar>
-#include <QApplication>
 
 #include <map>
 #include <vector>
@@ -38,6 +38,7 @@ public:
     std::vector<Terrain> terrains;
     void setUpGui();
     void resetGui();
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

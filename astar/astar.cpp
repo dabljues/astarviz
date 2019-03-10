@@ -43,9 +43,26 @@ void astar::on_buttonCalculate_clicked()
     auto last_box = this->ui->mapAreaGraphics->drawing_params.box_count - 1;
     auto maze = this->ui->mapAreaGraphics->get_maze();
     astar_algorithm alg(maze, QPoint(0, 0), QPoint(last_box, last_box));
-    auto result = alg.calculate(this->ui->mapAreaGraphics);
+    alg.set_visualization(true);
+    auto result = alg.calculate();
     this->ui->mapAreaGraphics->drawResult(result);
 }
+
+void astar::on_buttonCalculateNoViz_clicked()
+{
+    auto last_box = this->ui->mapAreaGraphics->drawing_params.box_count - 1;
+    auto maze = this->ui->mapAreaGraphics->get_maze();
+    astar_algorithm alg(maze, QPoint(0, 0), QPoint(last_box, last_box));
+    alg.set_visualization_grid(this->ui->mapAreaGraphics);
+    auto start = std::chrono::high_resolution_clock::now();
+    auto result = alg.calculate();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+    this->ui->mapAreaGraphics->drawResult(result);
+    QMessageBox::information(this, "Result", QString("Calculation time: %1").arg(elapsed),
+                             QMessageBox::Ok);
+}
+
 void astar::on_buttonResetUI_clicked()
 {
     this->ui->mapAreaGraphics->setUpGui();
